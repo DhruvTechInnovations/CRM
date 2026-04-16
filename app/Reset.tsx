@@ -159,7 +159,7 @@ export default function ResetPassword() {
                     {/* Back to Login */}
                     <TouchableOpacity
                         style={styles.backToLogin}
-                        onPress={() => router.replace('/')}
+                        onPress={() => router.replace('/(auth)/Login')}
                     >
                         <Ionicons name="arrow-back-circle-outline" size={18} color={theme.tint} />
                         <Text style={[styles.backToLoginText, { color: theme.tint }]}>

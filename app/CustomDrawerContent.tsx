@@ -1,3 +1,4 @@
+import { authService } from '@/services/apiService';
 import { Ionicons } from '@expo/vector-icons';
 import {
     DrawerContentScrollView
@@ -29,8 +30,9 @@ export default function CustomDrawerContent(props: any) {
     const insets = useSafeAreaInsets();
     const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
 
-    const handleLogout = () => {
-        router.replace('/' as any);
+    const handleLogout = async () => {
+        await authService.logout();
+        router.replace('/(auth)/Login' as any);
     };
 
     const handleCloseDrawer = () => {
@@ -105,6 +107,7 @@ export default function CustomDrawerContent(props: any) {
                         { icon: 'shield-checkmark-outline', label: 'Privacy & Policy', route: '/Privacy' },
                         { icon: 'lock-closed-outline', label: 'Reset Password', route: '/Reset' },
                         { icon: 'help-circle-outline', label: 'Help & Support', route: '/support' },
+                        { icon: 'notifications-outline', label: 'NotificationTest', route: '/NotificationTest' },
                     ].map((item, index) => (
                         <TouchableOpacity
                             key={index}

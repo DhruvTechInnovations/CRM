@@ -1,8 +1,11 @@
 import { authService } from '@/services/apiService';
+// import notifee from '@notifee/react-native';
+import privateApi from '@/services/privateapi';
 import CheckBox from "expo-checkbox";
 import { useRouter } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 import { Eye, EyeOff } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Alert,
     Image,
@@ -14,12 +17,46 @@ import {
     useColorScheme
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "../constants/theme";
-import Terms from "./Terms";
+import { Colors } from "../../constants/theme";
+import { useAuth } from '../../context/Authcontext';
+import { listenForegroundNotifications } from '../../services/notification/notification.handlers';
+import { setupNotificationNavigation } from '../../services/notification/notification.navigation';
+import { initNotifications } from '../../services/notification/notification.service';
+import Terms from "../Terms";
 
-const logo = require('../assets/images/icon.png');
-export default function LoginScreen() {
+
+
+const logo = require('../../assets/images/icon.png');
+
+// messaging().setBackgroundMessageHandler(async remoteMessage => {
+//     console.log('[FCM BACKGROUND]', remoteMessage);
+// });
+
+
+const FCM_TOKEN_KEY = 'fcmToken';
+export default function LoginScreen({ navigation }: any) {
+    useEffect(() => {
+        initNotifications();
+        setupNotificationNavigation(navigation);
+        listenForegroundNotifications((msg: any) => {
+            console.log('[FCM FOREGROUND]', msg);
+        });
+
+        // const unsubFg = messaging().onMessage(async msg => {
+        //     await notifee.displayNotification({
+        //         title: msg.notification?.title,
+        //         body: msg.notification?.body,
+        //         android: { channelId: 'default' },
+        //     });
+        // });
+
+        // ✅ Cleanup — prevents listener leak
+        // return () => unsubFg();
+
+    }, []);
+    console.log('first login rendered ')
     const router = useRouter();
+    const { state } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [agree, setAgree] = useState(false);
@@ -28,6 +65,14 @@ export default function LoginScreen() {
     const theme = Colors[colorScheme ?? 'light'];
     const insets = useSafeAreaInsets()
     const [showPassword, setShowPassword] = useState(false);
+
+    // if (state === 'loading' || state === 'authenticated') {
+    //     return (
+    //         <View style={[styles.container, { backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center' }]}>
+    //             <ActivityIndicator size="large" color={theme.text} />
+    //         </View>
+    //     );
+    // }
 
     const handleLogin = async () => {
         const gmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
@@ -54,9 +99,17 @@ export default function LoginScreen() {
         try {
             // API Call: Await the login response
             const res = await authService.login(email, password);
+            console.log("Login Response", res);
 
+            const fcmToken = await SecureStore.getItemAsync(FCM_TOKEN_KEY);
+
+            if (fcmToken) {
+                await privateApi.post('/fcm-token', {
+                    token: fcmToken,
+                });
+            }
             // Navigate only after successful login
-            router.replace("/Dashboard");
+            router.replace("/(tabs)/Dashboard");
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || 'Unable to connect to server.';
             Alert.alert('Login Failed', errorMessage);
