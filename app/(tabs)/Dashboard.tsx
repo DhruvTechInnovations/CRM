@@ -1,5 +1,6 @@
+import { useAuth } from '@/context/Authcontext';
+import { AuthTokenManager } from '@/scripts/authTokenManager';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import {
   Briefcase,
   ChevronRight,
@@ -23,7 +24,7 @@ import { PieChart } from 'react-native-gifted-charts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/theme';
 import { useLeads } from '../../context/LeadContext';
-import { authService, subscriptionService } from '../../services/apiService';
+import { subscriptionService } from '../../services/apiService';
 
 // Define Lead interface
 interface Lead {
@@ -88,6 +89,14 @@ export default function Dashboard() {
   const [subLoading, setSubLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const { isAuthenticated } = useAuth();
+
+
+  if (!isAuthenticated) {
+    router.replace('/(auth)/Login');
+  }
+
+
   // Refetch leads on mount to ensure we have data after login
   useEffect(() => {
     refetchLeads();
@@ -98,7 +107,7 @@ export default function Dashboard() {
       setSubLoading(true);
       const res = await subscriptionService.getSubscription();
       console.log("Subscription response:", res);
-      if (res && res.data[0].subscription_end_date) {
+      if (res && res.data && res.data.length > 0 && res.data[0].subscription_end_date) {
         console.log("Subscription end date:", res.data[0].subscription_end_date);
         setSubscription({
           end_date: res.data[0].subscription_end_date,
@@ -115,22 +124,23 @@ export default function Dashboard() {
     setRefreshing(true);
     try {
       // Check if token exists
-      const token = await SecureStore.getItemAsync('userToken');
+      const token = await AuthTokenManager.getToken();
+      console.log('from onRefresh', token)
       if (!token) {
-        router.replace('/');
+        router.replace('/(auth)/Login');
         return;
       }
 
       await Promise.all([
         refetchLeads(),
         fetchSubscription(),
-        authService.validateLogin()
+        // authService.validateLogin()
       ]);
     } catch (err: any) {
       console.error("Refresh failed:", err);
       // If it's an auth error (401), redirect to login
       if (err.response?.status === 401 || err.message?.includes('401')) {
-        router.replace('/');
+        router.replace('/(auth)/Login');
       }
     } finally {
       setRefreshing(false);

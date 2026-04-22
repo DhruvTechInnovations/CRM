@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import { leadService } from '../services/apiService';
-import { useNotification } from './NotificationContext';
+// import { useNotification } from './NotificationContext';
 const LeadContext = createContext(null);
 
 export const useLeads = () => {
@@ -12,7 +12,7 @@ export const useLeads = () => {
 };
 
 export const LeadProvider = ({ children }) => {
-    const { showNotification } = useNotification();
+    // const { showNotification } = useNotification();
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(false);
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "479285897634",
+    "project_id": "android-app-133e2",
+    "storage_bucket": "android-app-133e2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:479285897634:android:494787d20a4ba47c3d2afb",
+        "android_client_info": {
+          "package_name": "com.jplegalconnect.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_7CZ0vCEZN8I8Z4zQ65v53cj1dzqWagM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

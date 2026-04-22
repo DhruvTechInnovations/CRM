@@ -8,6 +8,7 @@ import CustomDrawerContent from '../CustomDrawerContent';
 export default function DrawerLayout() {
   const colorScheme = useColorScheme();
 
+
   return (
     <Drawer drawerContent={(props) => { return <CustomDrawerContent {...props} /> }}>
       <Drawer.Screen

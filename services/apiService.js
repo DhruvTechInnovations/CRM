@@ -1,9 +1,9 @@
+import { AuthTokenManager } from '@/scripts/authTokenManager';
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
 import { privateApi } from './privateapi';
 
-// const API_BASE_URL = 'http://10.0.2.2:3001/api';
-const API_BASE_URL = 'https://backend.com.jplawsuvidha.com/api';
+const API_BASE_URL = 'http://10.0.2.2:3001/api';
+// const API_BASE_URL = 'https://backend.com.jplawsuvidha.com/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -19,9 +19,18 @@ const prodApi = axios.create({
 export const authService = {
     validateLogin: async (signal) => {
         try {
-            const res = await api.get('/validate', { withCredentials: true, signal });
-            if (res.data && res.data.token) {
-                await SecureStore.setItemAsync('userToken', res.data.token);
+            const refreshToken = await AuthTokenManager.getRefreshToken();
+            console.log('refresh token', refreshToken)
+
+            if (!refreshToken) {
+                throw new Error('No refresh token');
+            }
+            const res = await api.post('/mobile/refresh', {
+                refreshToken,
+            });
+
+            if (res.data?.token) {
+                await AuthTokenManager.setToken(res.data.token);
             }
             return res;
         } catch (err) {
@@ -31,13 +40,15 @@ export const authService = {
 
     login: async (email, password) => {
         try {
-            const res = await api.post('/login', { email, password }, { withCredentials: true });
+            const res = await api.post('/mobile/login', { email, password }, { withCredentials: true });
             console.log('login data', res.data)
             if (res.data.token) {
-                await SecureStore.setItemAsync('userToken', res.data.token);
+                await AuthTokenManager.setToken(res.data.token);
+                await AuthTokenManager.setRefreshToken(res.data.refreshToken);
             }
             return res.data;
         } catch (err) {
+            console.log('error is', err)
             throw err;
         }
     },
@@ -45,7 +56,8 @@ export const authService = {
     logout: async () => {
         try {
             await api.post('/logout', {}, { withCredentials: true });
-            await SecureStore.deleteItemAsync('userToken');
+            await AuthTokenManager.clearToken();
+            await AuthTokenManager.clearRefreshToken();
         } catch (err) {
             throw err;
         }
@@ -106,12 +118,20 @@ export const profileService = {
     updateProfile: async (profileData) => {
         try {
             const res = await privateApi.put('/profile', profileData);
-            return res.data;
+            return res;
         } catch (err) {
             throw err;
         }
-    }
+    },
+    updateProfileImage: async (formData) => {
+        return privateApi.post("/profile/upload-profile", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+    },
 };
+
 
 export const leadService = {
     getLeads: async () => {
