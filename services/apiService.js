@@ -118,12 +118,20 @@ export const profileService = {
     updateProfile: async (profileData) => {
         try {
             const res = await privateApi.put('/profile', profileData);
-            return res.data;
+            return res;
         } catch (err) {
             throw err;
         }
-    }
+    },
+    updateProfileImage: async (formData) => {
+        return privateApi.post("/profile/upload-profile", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+    },
 };
+
 
 export const leadService = {
     getLeads: async () => {

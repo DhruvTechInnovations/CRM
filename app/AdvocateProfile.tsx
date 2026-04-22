@@ -159,35 +159,80 @@ export default function AdvocateProfile() {
         return true;
     };
 
-    const handleFinishUpdate = () => {
+    // const handleFinishUpdate = () => {
+    //     if (!validateForm()) return;
+
+    //     // Log profile data with timestamp
+    //     const timestamp = new Date().toISOString();
+    //     const profileData = {
+    //         timestamp,
+    //         fullName,
+    //         email,
+    //         barId,
+    //         state: state === "Other" ? otherState : state,
+    //         zipcode,
+    //         address,
+    //         phone,
+    //         image: uploadImage()
+    //     };
+
+
+
+
+    //     // console.log('profile data 🫵🏻🎶👀🚀', profileData.image);
+
+    //     // API Call
+    //     profileService.updateProfile(profileData);
+    //     // api.history.log({ type: 'PROFILE_UPDATE', timestamp });
+
+    //     // Add API call here to save profile data
+    //     Alert.alert(
+    //         "Profile Updated",
+    //         "Your profile has been updated successfully!",
+    //         [{ text: "OK" }]
+    //     );
+    // };
+    const handleFinishUpdate = async () => {
         if (!validateForm()) return;
 
-        // Log profile data with timestamp
-        const timestamp = new Date().toISOString();
-        const profileData = {
-            timestamp,
-            fullName,
-            email,
-            barId,
-            state: state === "Other" ? otherState : state,
-            zipcode,
-            address,
-            phone,
-            image,
-        };
+        try {
+            const timestamp = new Date().toISOString();
 
-        // API Call
-        profileService.updateProfile(profileData);
-        // api.history.log({ type: 'PROFILE_UPDATE', timestamp });
+            let uploadedImageUrl = null;
 
-        // Add API call here to save profile data
-        Alert.alert(
-            "Profile Updated",
-            "Your profile has been updated successfully!",
-            [{ text: "OK" }]
-        );
+            // upload image first
+            if (image) {
+                uploadedImageUrl = await uploadImage();
+            }
+
+            const profileData = {
+                timestamp,
+                fullName,
+                email,
+                barId,
+                state: state === "Other" ? otherState : state,
+                zipcode,
+                address,
+                phone,
+                image: uploadedImageUrl, // 👈 real S3 URL
+            };
+
+            console.log("profile payload 🫵🏻🎶👀🚀", profileData);
+
+            // save profile (WAIT FOR IT)
+            const res = await profileService.updateProfile(profileData);
+            console.log("profile response: 🫵🏻🎶👀🚀", res.data);
+
+            if (res.status !== 200) {
+                throw new Error("Profile update failed");
+            }
+
+            Alert.alert("Success", "Profile updated successfully!");
+        } catch (error) {
+            console.log("profile update error:", error);
+            Alert.alert("Error", "Failed to update profile");
+        }
     };
-
     if (profileLoading) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }]}>
@@ -222,6 +267,37 @@ export default function AdvocateProfile() {
             borderColor: dark ? '#334155' : '#F1F5F9',
         }
     ];
+    const uploadImage = async () => {
+        if (!image) {
+            console.log("No image found");
+            return null;
+        }
+
+        const uri = image.startsWith("file://")
+            ? image
+            : `file://${image}`;
+
+        const formData = new FormData();
+
+        formData.append("file", {
+            uri,
+            name: `upload-${Date.now()}.jpg`,
+            type: "image/jpeg",
+        } as any);
+
+        console.log("before image upload 🫵🏻🎶👀🚀");
+
+        try {
+            const res = await profileService.updateProfileImage(formData);
+
+            console.log("image uploaded 🫵🏻🎶👀🚀", res.data);
+
+            return res.data?.imageUrl;
+        } catch (error) {
+            console.log("upload error:", error);
+            return null;
+        }
+    };
 
     return (
         <KeyboardAwareScrollView

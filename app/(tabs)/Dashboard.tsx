@@ -1,3 +1,4 @@
+import { useAuth } from '@/context/Authcontext';
 import { AuthTokenManager } from '@/scripts/authTokenManager';
 import { useRouter } from 'expo-router';
 import {
@@ -88,6 +89,14 @@ export default function Dashboard() {
   const [subLoading, setSubLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const { isAuthenticated } = useAuth();
+
+
+  if (!isAuthenticated) {
+    router.replace('/(auth)/Login');
+  }
+
+
   // Refetch leads on mount to ensure we have data after login
   useEffect(() => {
     refetchLeads();
@@ -118,7 +127,7 @@ export default function Dashboard() {
       const token = await AuthTokenManager.getToken();
       console.log('from onRefresh', token)
       if (!token) {
-        router.replace('/');
+        router.replace('/(auth)/Login');
         return;
       }
 
@@ -131,7 +140,7 @@ export default function Dashboard() {
       console.error("Refresh failed:", err);
       // If it's an auth error (401), redirect to login
       if (err.response?.status === 401 || err.message?.includes('401')) {
-        router.replace('/');
+        router.replace('/(auth)/Login');
       }
     } finally {
       setRefreshing(false);

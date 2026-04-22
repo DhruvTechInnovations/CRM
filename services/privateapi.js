@@ -19,6 +19,7 @@ privateApi.interceptors.request.use(
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
+            console.log('config is 🫵🏻🎶👀🚀');
         } catch (error) {
             // Error
         }
@@ -76,7 +77,7 @@ privateApi.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Prevent infinite loop
+        // Prevent infinite loops
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
@@ -86,7 +87,7 @@ privateApi.interceptors.response.use(
                 if (!refreshToken) throw new Error('No refresh token');
 
                 const res = await axios.post(
-                    'http://10.0.2.2:3001/api/mobile/refresh',
+                    `${API_BASE_URL}/mobile/refresh`,
                     { refreshToken }
                 );
 

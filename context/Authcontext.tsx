@@ -1,29 +1,47 @@
 // context/AuthContext.tsx
+
 import { bootstrapAuth } from '@/scripts/bootstrapLogin';
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type AuthState = 'loading' | 'authenticated' | 'unauthenticated';
 
-const AuthContext = createContext<{ state: AuthState }>({ state: 'loading' });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>('loading');
+type AuthContextType = {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: () => void;
+  logout: () => void;
+};
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: any) {
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    checkToken();
+    async function init() {
+      const auth = await bootstrapAuth();
+      setIsAuthenticated(auth);
+      setIsLoading(false);
+    }
+    init();
   }, []);
 
-  async function checkToken() {
-    try {
-      const token = await bootstrapAuth();
-      // optionally validate token with your backend here
-      setState(token ? 'authenticated' : 'unauthenticated');
-    } catch {
-      setState('unauthenticated');
-    }
-  }
+  const login = () => setIsAuthenticated(true);
+  const logout = () => setIsAuthenticated(false);
 
-  return <AuthContext.Provider value={{ state }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
+  return context;
+};
