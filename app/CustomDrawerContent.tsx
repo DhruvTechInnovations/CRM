@@ -107,7 +107,6 @@ export default function CustomDrawerContent(props: any) {
                         { icon: 'shield-checkmark-outline', label: 'Privacy & Policy', route: '/Privacy' },
                         { icon: 'lock-closed-outline', label: 'Reset Password', route: '/Reset' },
                         { icon: 'help-circle-outline', label: 'Help & Support', route: '/support' },
-                        { icon: 'notifications-outline', label: 'NotificationTest', route: '/NotificationTest' },
                     ].map((item, index) => (
                         <TouchableOpacity
                             key={index}
