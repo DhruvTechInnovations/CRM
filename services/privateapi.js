@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://10.0.2.2:3001/api';
 // const API_BASE_URL = 'https://backend.com.jplawsuvidha.com/api';
+// const API_BASE_URL = 'http://localhost:3001/api';
 
 
 export const privateApi = axios.create({

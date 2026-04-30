@@ -101,6 +101,7 @@ export default function CustomDrawerContent(props: any) {
                 <View style={styles.customMenuSection}>
                     {[
                         { icon: 'person-outline', label: 'Profile', route: '/AdvocateProfile' },
+                        { icon: 'card-outline', label: 'Subscription', route: '/Subscription' },
                         // { icon: 'settings-outline', label: 'Settings', route: '/settings' },
                         { icon: 'calendar-outline', label: 'Calendar', route: '/Calendar' },
                         { icon: 'notifications-outline', label: 'Notifications', route: null },

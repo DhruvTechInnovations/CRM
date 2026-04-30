@@ -15,7 +15,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "googleServicesFile": "./assets/firebase/GoogleService-Info.plist",
+
       "supportsTablet": true,
       "bundleIdentifier": "com.jplegalconnect.app",
       "infoPlist": {
@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
+
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
@@ -47,14 +47,10 @@
       "expo-router",
       "./plugins/with16kbSupport",
       "expo-secure-store",
-      "@react-native-firebase/app",
-      "@react-native-firebase/messaging",
+
       [
         "expo-build-properties",
         {
-          "ios": {
-            "useFrameworks": "static"
-          },
           "android": {
             "useLegacyPackaging": true
           }

@@ -4,6 +4,7 @@ import { privateApi } from './privateapi';
 
 const API_BASE_URL = 'http://10.0.2.2:3001/api';
 // const API_BASE_URL = 'https://backend.com.jplawsuvidha.com/api';
+// const API_BASE_URL = 'http://localhost:3001/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -217,6 +218,32 @@ export const subscriptionService = {
     }
 };
 
+export const paymentService = {
+    createRazorpayOrder: async (planDetails) => {
+        try {
+            console.log('plan details', planDetails)
+            // Placeholder: Replace with actual endpoint to create order
+            const res = await privateApi.post('/create-payment-order', planDetails);
+            console.log('order response from api', res.data)
+            return res.data;
+        } catch (err) {
+            console.error('Error creating Razorpay order:', err);
+            throw err;
+        }
+    },
+    verifyPayment: async (paymentDetails) => {
+        try {
+            console.log('payment details', paymentDetails)
+            // Placeholder: Replace with actual endpoint to verify signature
+            const res = await privateApi.post('/payment-verify', paymentDetails);
+            return res.data;
+        } catch (err) {
+            console.error('Error verifying Razorpay payment:', err);
+            throw err;
+        }
+    }
+};
+
 // For backward compatibility while components still use the old `api` object
 export const api_legacy = {
     auth: authService,
@@ -230,7 +257,8 @@ export const api_legacy = {
         get: profileService.getProfile,
         update: profileService.updateProfile,
     },
-    subscription: subscriptionService
+    subscription: subscriptionService,
+    payment: paymentService
 };
 
 export default api;
