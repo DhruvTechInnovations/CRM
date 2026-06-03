@@ -2,9 +2,11 @@ import { AuthTokenManager } from '@/scripts/authTokenManager';
 import axios from 'axios';
 import { privateApi } from './privateapi';
 
-const API_BASE_URL = 'http://10.0.2.2:3001/api';
-// const API_BASE_URL = 'https://backend.com.jplawsuvidha.com/api';
+// const API_BASE_URL = 'http://[IP_ADDRESS]';
+const API_BASE_URL = 'https://backend.com.jplawsuvidha.com/api';
 // const API_BASE_URL = 'http://localhost:3001/api';
+// const API_BASE_URL = 'http://10.0.2.2:3001/api';
+
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -261,4 +263,16 @@ export const api_legacy = {
     payment: paymentService
 };
 
+
+export const notificationService = {
+    saveOneSignalId: async (email, onesignalId) => {
+        console.log('check 1 from notification api')
+        const res = await privateApi.post("/onesignalId", {
+            email,
+            onesignal_id: onesignalId,
+        });
+        console.log('check 2 from notificaiton api')
+        return res.data;
+    },
+};
 export default api;

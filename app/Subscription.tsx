@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -12,7 +13,9 @@ import {
   View
 } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { paymentService } from '../services/apiService';
+
 
 // Placeholder for your Razorpay API Key ID (e.g., rzp_test_xxxxx)
 const RAZORPAY_KEY_ID = 'rzp_test_SjDChXI2EGWTTh';
@@ -20,6 +23,9 @@ const RAZORPAY_KEY_ID = 'rzp_test_SjDChXI2EGWTTh';
 export default function Subscription() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+
 
   // Example subscription plans
   const plans = [
@@ -106,13 +112,14 @@ export default function Subscription() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#1F2937" />
+      <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.card }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Subscription Plans</Text>
-        <View style={{ width: 24 }} />
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Subscription Plans</Text>
+        <View style={{ width: 40 }} />
       </View>
+
 
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.introContainer}>

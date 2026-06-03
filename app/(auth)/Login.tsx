@@ -1,9 +1,7 @@
-import { authService } from '@/services/apiService';
+import { authService, notificationService } from '@/services/apiService';
 // import notifee from '@notifee/react-native';
-import privateApi from '@/services/privateapi';
 import CheckBox from "expo-checkbox";
 import { useRouter } from "expo-router";
-import * as SecureStore from 'expo-secure-store';
 import { Eye, EyeOff } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -20,10 +18,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../constants/theme";
 // import { useAuth } from '../../context/Authcontext';
 import { useAuth } from '@/context/Authcontext';
+import { OneSignal } from 'react-native-onesignal';
 import Terms from "../Terms";
 
 
 const logo = require('../../assets/images/icon.png');
+
 
 // messaging().setBackgroundMessageHandler(async remoteMessage => {
 //     console.log('[FCM BACKGROUND]', remoteMessage);
@@ -94,22 +94,44 @@ export default function LoginScreen({ navigation }: any) {
         }
 
 
-        try {
-            // API Call: Await the login response
-            const res = await authService.login(email, password);
-            console.log("Login Response", res);
-            login()
-            const fcmToken = await SecureStore.getItemAsync(FCM_TOKEN_KEY);
+        // try {
+        //     // API Call: Await the login response
+        //     const res = await authService.login(email, password);
+        //     console.log("Login Response", res);
+        //     login()
+        //     // const fcmToken = await SecureStore.getItemAsync(FCM_TOKEN_KEY);
 
-            if (fcmToken) {
-                await privateApi.post('/fcm-token', {
-                    token: fcmToken,
-                });
+        //     // if (fcmToken) {
+        //     //     await privateApi.post('/fcm-token', {
+        //     //         token: fcmToken,
+        //     //     });
+        //     // }
+        //     await OneSignal.login(res.data.data.user_id)
+        //     router.replace("/(tabs)/Dashboard");
+        //     // Navigate only after successful login
+        // } catch (error: any) {
+        //     const errorMessage = error.response?.data?.message || error.message || 'Unable to connect to server.';
+        // }
+        try {
+            const res = await authService.login(email, password);
+            console.log("response after login", res.email)
+
+            login();
+
+            const oneSignalId = await OneSignal.User.getOnesignalId();
+
+            console.log("OneSignal ID:", oneSignalId);
+
+            if (oneSignalId) {
+                console.log("check 1")
+                const result = await notificationService.saveOneSignalId(email, oneSignalId);
+                console.log('check 2', result)
+                console.log("one signal id created")
             }
+
             router.replace("/(tabs)/Dashboard");
-            // Navigate only after successful login
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || 'Unable to connect to server.';
+        } catch (error) {
+            console.log(error);
         }
     };
 
