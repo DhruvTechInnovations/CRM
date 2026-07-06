@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#f1f5f9',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
