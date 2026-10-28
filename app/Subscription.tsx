@@ -53,7 +53,6 @@ export default function Subscription() {
       // Provide plan details to backend so it can generate an amount-specific order
       const orderResponse = await paymentService.createRazorpayOrder({
         planId: plan.id,
-
       });
 
       console.log('orderResponse ', orderResponse)
@@ -83,14 +82,20 @@ export default function Subscription() {
         // 2. Open Razorpay Checkout
         const paymentDate = await RazorpayCheckout.open(options)
         console.log('paymentDate ', paymentDate)
-        Alert.alert('Success', `You have successfully subscribed to ${plan.name}!`);
-        router.replace('/(tabs)/Dashboard')
         const verificationResponse = await paymentService.verifyPayment({
           razorpay_payment_id: paymentDate.razorpay_payment_id,
           razorpay_order_id: paymentDate.razorpay_order_id,
           razorpay_signature: paymentDate.razorpay_signature,
-          planId: plan.id,
+          planId: plan.id
         });
+        if (verificationResponse.success) {
+          Alert.alert('Success', `You have successfully subscribed to ${plan.name}!`);
+          router.replace('/(tabs)/Dashboard')
+        }
+        else {
+          Alert.alert('Error', `Unable to verify payment. Please try again.`)
+
+        }
       } catch (error) {
         console.log("paymentDate error ", error)
       }

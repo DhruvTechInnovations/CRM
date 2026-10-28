@@ -1,9 +1,11 @@
 import { AuthTokenManager } from '@/scripts/authTokenManager';
 import axios from 'axios';
 
-// const API_BASE_URL = 'http://10.0.2.2:3002/api';
-const API_BASE_URL = 'https://backend.jplawsuvidha.com/api';
+const API_BASE_URL = 'http://10.0.2.2:3002/api';
+// const API_BASE_URL = 'https://backend.jplawsuvidha.com/api';
 // const API_BASE_URL = 'http://localhost:3001/api';
+// const API_BASE_URL = 'https://5e84-2405-201-c403-702b-3112-d8d6-4889-2229.ngrok-free.app/api';
+
 
 
 export const privateApi = axios.create({
