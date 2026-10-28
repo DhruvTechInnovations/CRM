@@ -82,6 +82,7 @@ export function AppNavigator() {
                                 <Stack.Screen name="Reset" options={{ headerShown: false }} />
                                 <Stack.Screen name="support" options={{ headerShown: false }} />
                                 <Stack.Screen name="Settings" options={{ headerShown: false }} />
+                                <Stack.Screen name="Subscription" options={{ headerShown: false }} />
                             </Stack>
                         </ThemeProvider>
                     </CalendarProvider>

@@ -1,4 +1,5 @@
-import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+// ── Firebase imports commented out – using OneSignal instead ──────────────────
+// import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { router } from 'expo-router';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
@@ -46,7 +47,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // ── Push notification state ───────────────────────────────────────────────
-    const [pushToken, setPushToken] = useState<string | null>(null);
+    // const [pushToken, setPushToken] = useState<string | null>(null);
 
     // ── In-app toast helpers ──────────────────────────────────────────────────
     const showNotification = useCallback((
@@ -74,54 +75,61 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
         setNotification(null);
     }, []);
 
-    // ── Resolve notification tap → navigate ───────────────────────────────────
-    const handleNotificationResponse = useCallback(
-        (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
-            const data = remoteMessage.data ?? {};
-            try {
-                if (data.screen && typeof data.screen === 'string') {
-                    router.push(data.screen as never);
-                }
-            } catch (e) {
-                console.warn('[NotificationContext] Navigation failed:', e);
-            }
-        },
-        [],
-    );
+    // ── Firebase push notification code commented out – using OneSignal ───────
+    // const handleNotificationResponse = useCallback(
+    //     (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+    //         const data = remoteMessage.data ?? {};
+    //         try {
+    //             if (data.screen && typeof data.screen === 'string') {
+    //                 router.push(data.screen as never);
+    //             }
+    //         } catch (e) {
+    //             console.warn('[NotificationContext] Navigation failed:', e);
+    //         }
+    //     },
+    //     [],
+    // );
 
     // ── Bootstrap Firebase Push Notifications on mount ────────────────────────────
+    // useEffect(() => {
+    //     // Register & get toke
+    //
+    //     // 1. Foreground listener — intercept and show our custom in-app banner
+    //     const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
+    //         const title = remoteMessage.notification?.title;
+    //         const body = remoteMessage.notification?.body;
+    //         const screen = remoteMessage.data?.screen as string | undefined;
+    //
+    //         showNotification(
+    //             body ?? '',
+    //             'push',
+    //             5000,
+    //             title ?? 'JPLegalConnect',
+    //             screen ? () => router.push(screen as never) : null,
+    //         );
+    //     });
+    //
+    //     // 2. Background tap listener
+    //     const unsubscribeBackgroundTap = messaging().onNotificationOpenedApp(remoteMessage => {
+    //         handleNotificationResponse(remoteMessage);
+    //     });
+    //
+    //     // 3. Quit state tap listener (handled when app completely boots from quit via tap)
+    //     messaging().getInitialNotification().then(remoteMessage => {
+    //         if (remoteMessage) handleNotificationResponse(remoteMessage);
+    //     });
+    //
+    //     return () => {
+    //         if (timerRef.current) clearTimeout(timerRef.current);
+    //         unsubscribeForeground();
+    //         unsubscribeBackgroundTap();
+    //     };
+    // }, []);
+
+    // Clean up timer on unmount
     useEffect(() => {
-        // Register & get toke
-
-        // 1. Foreground listener — intercept and show our custom in-app banner
-        const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
-            const title = remoteMessage.notification?.title;
-            const body = remoteMessage.notification?.body;
-            const screen = remoteMessage.data?.screen as string | undefined;
-
-            showNotification(
-                body ?? '',
-                'push',
-                5000,
-                title ?? 'JPLegalConnect',
-                screen ? () => router.push(screen as never) : null,
-            );
-        });
-
-        // 2. Background tap listener
-        const unsubscribeBackgroundTap = messaging().onNotificationOpenedApp(remoteMessage => {
-            handleNotificationResponse(remoteMessage);
-        });
-
-        // 3. Quit state tap listener (handled when app completely boots from quit via tap)
-        messaging().getInitialNotification().then(remoteMessage => {
-            if (remoteMessage) handleNotificationResponse(remoteMessage);
-        });
-
         return () => {
             if (timerRef.current) clearTimeout(timerRef.current);
-            unsubscribeForeground();
-            unsubscribeBackgroundTap();
         };
     }, []);
 

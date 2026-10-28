@@ -24,9 +24,9 @@ export default function RootLayout() {
     // Prompt for push permission on first launch.
     // In production, consider using an in-app mssage instead for better opt-in rates.
     OneSignal.Notifications.requestPermission(true);
-    OneSignal.User.getOnesignalId().then((id) => {
-      console.log('OneSignal ID:', id);
-    });
+    // OneSignal.User.getOnesignalId().then((id) => {
+    //   console.log('OneSignal ID:', id);
+    // });
   }, []);
   return (
     <KeyboardProvider>
